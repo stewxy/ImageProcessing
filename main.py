@@ -1,44 +1,96 @@
+import os
+
 import cv2
 import pytesseract
-from PIL import ImageGrab
+from PIL import ImageGrab, ImageTk, ImageEnhance
 import numpy as np
 import tkinter as tk
 
-root = tk.Tk()
+root = tk.Tk()  # initialize tkinter framework
 root.title("GUI")
+root.resizable(0, 0)  # disable resizing
 
-pytesseract.pytesseract.tesseract_cmd = r'C:\Users\Stephen Wong\AppData\Local\Programs\Tesseract-OCR\tesseract.exe'
-
-image = cv2.imread('numbers.png')
-
-# Add Binarization (Thresholding), Noise Removal, Dilation and Erosion, Deskewing from openCV
-# gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-# text = pytesseract.image_to_string(gray)
+# pytesseract.pytesseract.tesseract_cmd = r'C:\Users\Stephen Wong\AppData\Local\Programs\Tesseract-OCR\tesseract.exe'
+#
+# image = cv2.imread('numbers.png')
+#
+# # Add Binarization (Thresholding), Noise Removal, Dilation and Erosion, Deskewing from openCV
+# # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+# # text = pytesseract.image_to_string(gray)
+# # print(text)
+#
+# text = pytesseract.image_to_string(image, config="--psm 6")
 # print(text)
-
-text = pytesseract.image_to_string(image, config="--psm 6")
-print(text)
 
 # Screenshot
 # screenshot = ImageGrab.grab()
 # screenshot.save("screenshot.png")
 # screenshot.close()
 
+
+def show_image(image):
+    win = tk.Toplevel()
+    win.image = ImageTk.PhotoImage(image)
+    tk.Label(win, image=win.image).pack()
+    win.grab_set()
+    win.wait_window(win)
+
+
 # Record mouse coordinates
-win = tk.Toplevel()
 def area_sel():
 
     x1 = x2 = y1 = y2 = 0
+    roi_image = None
 
     def on_mouse_down(event):
+        nonlocal x1, y1
         x1, y1 = event.x, event.y
+        canvas.create_rectangle(x1, y1, x1, y1, outline='red', tag='roi')
         print('{}, {}'.format(x1, y1))
-    def on_mouse_release(event):
+
+    def on_mouse_move(event):
+        nonlocal roi_image, x2, y2
         x2, y2 = event.x, event.y
-        print('{}, {}'.format(x2, y2))
+        canvas.delete('roi-image')  # remove old selected image
+        roi_image = image.crop((x1, y1, x2, y2))  # get the image of selected region
+        canvas.image = ImageTk.PhotoImage(roi_image)
+        canvas.create_image(x1, y1, image=canvas.image, tag=('roi-image'), anchor='nw')
+        canvas.coords('roi', x1, y1, x2, y2)
+        canvas.lift('roi')  # places select rectangle on top of overlay image
+
+    def on_mouse_release(event):
+            x2, y2 = event.x, event.y
+            print('{}, {}'.format(x2, y2))
+            win.destroy()
+
+    root.withdraw()  # hide GUI
+    image = ImageGrab.grab()  # grab current screen
+
+    bgimage = ImageEnhance.Brightness(image).enhance(0.3)  # darken background
+
+    win = tk.Toplevel()  # initializes instance of tkinter window
+    win.attributes('-fullscreen', 1)  # GUI window size
+    win.attributes('-topmost', 1)
+
+    canvas = tk.Canvas(win, highlightthickness=0)  # set canvas to be drawn on
+    canvas.pack(fill='both', expand=1)
+    tkimage = ImageTk.PhotoImage(bgimage)
+    canvas.create_image(0, 0, image=tkimage, anchor='nw', tag='images')
 
     win.bind('<ButtonPress-1>', on_mouse_down)
+    win.bind('<B1-Motion>', on_mouse_move)
     win.bind('<ButtonRelease-1>', on_mouse_release)
+    win.bind('<Escape>', lambda e: win.destroy())
 
-btn = tk.Button(root, text='select area', width=20, command=area_sel).pack()
+    win.focus_force()
+    win.grab_set()
+    win.wait_window(win)
+    root.deiconify()
+
+    # show selected region as an image if an area was selected
+    if roi_image:
+        show_image(roi_image)
+
+
+btn = tk.Button(root, text='select area', width=30, command=area_sel).pack()  # select area GUI button
 root.mainloop()
