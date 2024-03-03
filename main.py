@@ -28,12 +28,14 @@ print(text)
 win = tk.Toplevel()
 def area_sel():
 
-    x1, x2, y1, y2 = 0
+    x1 = x2 = y1 = y2 = 0
 
     def on_mouse_down(event):
         x1, y1 = event.x, event.y
+        print('{}, {}'.format(x1, y1))
     def on_mouse_release(event):
         x2, y2 = event.x, event.y
+        print('{}, {}'.format(x2, y2))
 
     win.bind('<ButtonPress-1>', on_mouse_down)
     win.bind('<ButtonRelease-1>', on_mouse_release)
