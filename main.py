@@ -10,7 +10,7 @@ root = tk.Tk()  # initialize tkinter framework
 root.title("GUI")
 root.resizable(0, 0)  # disable resizing
 
-# pytesseract.pytesseract.tesseract_cmd = r'C:\Users\Stephen Wong\AppData\Local\Programs\Tesseract-OCR\tesseract.exe'
+pytesseract.pytesseract.tesseract_cmd = r'C:\Users\Stephen Wong\AppData\Local\Programs\Tesseract-OCR\tesseract.exe'
 #
 # image = cv2.imread('numbers.png')
 #
@@ -33,7 +33,15 @@ def show_image(image):
     win.image = ImageTk.PhotoImage(image)
     tk.Label(win, image=win.image).pack()
     win.grab_set()
-    win.wait_window(win)
+    # win.wait_window(win)  # leave window open and wait for window to be destroyed/closed
+
+    print("hi")
+    image = image.save("sample.png")
+    read_image = cv2.imread("sample.png")
+    text = pytesseract.image_to_string(read_image, config="--psm 6")
+    print(text)
+    os.remove("sample.png")
+    win.destroy()
 
 
 # Record mouse coordinates
