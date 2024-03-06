@@ -1,33 +1,42 @@
 import os
-
 import cv2
 import pytesseract
-from PIL import ImageGrab, ImageTk, ImageEnhance
+from PIL import Image, ImageGrab, ImageTk, ImageEnhance
 import numpy as np
 import tkinter as tk
 
+'''
 root = tk.Tk()  # initialize tkinter framework
 root.title("GUI")
 root.resizable(0, 0)  # disable resizing
+'''
 
 pytesseract.pytesseract.tesseract_cmd = r'C:\Users\Stephen Wong\AppData\Local\Programs\Tesseract-OCR\tesseract.exe'
-#
-# image = cv2.imread('numbers.png')
-#
+
 # # Add Binarization (Thresholding), Noise Removal, Dilation and Erosion, Deskewing from openCV
 # # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 # # text = pytesseract.image_to_string(gray)
 # # print(text)
 #
-# text = pytesseract.image_to_string(image, config="--psm 6")
-# print(text)
-
-# Screenshot
-# screenshot = ImageGrab.grab()
-# screenshot.save("screenshot.png")
-# screenshot.close()
 
 
+def calculate(text):
+    x = text.split("+")
+    print(x)
+    return sum([int(i) for i in x])
+
+
+read_image = cv2.imread("equation.png")
+
+text = pytesseract.image_to_string(read_image, config="--psm 7")
+print(text)
+
+#(calculate(text))
+
+# cv2.imshow('gray', gray)
+# cv2.waitKey()
+
+'''
 def show_image(image):
     win = tk.Toplevel()
     win.image = ImageTk.PhotoImage(image)
@@ -35,7 +44,6 @@ def show_image(image):
     win.grab_set()
     # win.wait_window(win)  # leave window open and wait for window to be destroyed/closed
 
-    print("hi")
     image = image.save("sample.png")
     read_image = cv2.imread("sample.png")
     text = pytesseract.image_to_string(read_image, config="--psm 6")
@@ -45,6 +53,7 @@ def show_image(image):
 
 
 # Record mouse coordinates
+
 def area_sel():
 
     x1 = x2 = y1 = y2 = 0
@@ -102,3 +111,4 @@ def area_sel():
 
 btn = tk.Button(root, text='select area', width=30, command=area_sel).pack()  # select area GUI button
 root.mainloop()
+'''
