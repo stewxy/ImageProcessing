@@ -25,16 +25,27 @@ def calculate(text):
     print(x)
     return sum([int(i) for i in x])
 
+alpha = 1.5 # Contrast control
+beta = 10 # Brightness control
 
-read_image = cv2.imread("equation.png")
 
-text = pytesseract.image_to_string(read_image, config="--psm 7")
+image = cv2.imread("messy.png")
+gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+#img_smooth = cv2.GaussianBlur(gray, (13,13), 0)
+con = cv2.convertScaleAbs(gray, alpha = alpha, beta = beta)
+
+invert = cv2.bitwise_not(gray)
+
+text = pytesseract.image_to_string(image, config="--psm 7, -l eng+equ")
 print(text)
 
 #(calculate(text))
 
-# cv2.imshow('gray', gray)
-# cv2.waitKey()
+cv2.imshow('gray', gray)
+cv2.imshow('invert', invert)
+cv2.imshow('con', con)
+
+cv2.waitKey()
 
 '''
 def show_image(image):
