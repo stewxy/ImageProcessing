@@ -25,26 +25,28 @@ def calculate(text):
     print(x)
     return sum([int(i) for i in x])
 
-alpha = 1.5 # Contrast control
-beta = 10 # Brightness control
 
-
-image = cv2.imread("images/messy.png")
+image = cv2.imread("images/addition.png")
+#Grayscale
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-#img_smooth = cv2.GaussianBlur(gray, (13,13), 0)
-con = cv2.convertScaleAbs(gray, alpha = alpha, beta = beta)
 
-invert = cv2.bitwise_not(gray)
+#Dilation + Erosion
+matrix = (5, 5)
+kernel = np.ones(matrix, np.uint8) #Kernel Matrix
+dilate_erode = cv2.dilate(gray, kernel, iterations=1)
+dilate_erode = cv2.erode(dilate_erode, kernel, iterations=2)
 
-text = pytesseract.image_to_string(image, config="--psm 7, -l eng+equ")
+cv2.imwrite("images/removed_noise.png", dilate_erode)
+
+
+#invert = cv2.bitwise_not(gray)
+
+text = pytesseract.image_to_string(image)
 print(text)
 
 #(calculate(text))
 
 cv2.imshow('gray', gray)
-cv2.imshow('invert', invert)
-cv2.imshow('con', con)
-
 cv2.waitKey()
 
 
