@@ -47,6 +47,7 @@ cv2.imshow('con', con)
 
 cv2.waitKey()
 
+
 '''
 def show_image(image):
     win = tk.Toplevel()
@@ -55,11 +56,11 @@ def show_image(image):
     win.grab_set()
     # win.wait_window(win)  # leave window open and wait for window to be destroyed/closed
 
-    image = image.save("sample.png")
-    read_image = cv2.imread("sample.png")
+    image = image.save("images/sample.png")
+    read_image = cv2.imread("images/sample.png")
     text = pytesseract.image_to_string(read_image, config="--psm 6")
     print(text)
-    os.remove("sample.png")
+    os.remove("images/sample.png")
     win.destroy()
 
 
