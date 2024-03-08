@@ -29,7 +29,7 @@ alpha = 1.5 # Contrast control
 beta = 10 # Brightness control
 
 
-image = cv2.imread("messy.png")
+image = cv2.imread("images/messy.png")
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 #img_smooth = cv2.GaussianBlur(gray, (13,13), 0)
 con = cv2.convertScaleAbs(gray, alpha = alpha, beta = beta)
