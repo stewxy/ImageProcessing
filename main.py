@@ -31,22 +31,25 @@ image = cv2.imread("images/addition.png")
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
 #Dilation + Erosion
-matrix = (5, 5)
+matrix = (2, 3)
 kernel = np.ones(matrix, np.uint8) #Kernel Matrix
-dilate_erode = cv2.dilate(gray, kernel, iterations=1)
-dilate_erode = cv2.erode(dilate_erode, kernel, iterations=2)
+dilate = cv2.dilate(gray, kernel, iterations=1)
+dilate_erode = cv2.erode(dilate, kernel, iterations=2)
 
-cv2.imwrite("images/removed_noise.png", dilate_erode)
+#Threshold
+thresh = cv2.threshold(dilate_erode, 127, 255, cv2.THRESH_BINARY)[1]
+
 
 
 #invert = cv2.bitwise_not(gray)
 
-text = pytesseract.image_to_string(image)
+text = pytesseract.image_to_string(thresh)
 print(text)
 
 #(calculate(text))
 
 cv2.imshow('gray', gray)
+cv2.imshow('thresh', thresh)
 cv2.waitKey()
 
 
