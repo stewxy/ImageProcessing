@@ -5,16 +5,15 @@ from PIL import Image, ImageGrab, ImageTk, ImageEnhance
 import numpy as np
 import tkinter as tk
 
-'''
 root = tk.Tk()  # initialize tkinter framework
 root.title("GUI")
 root.resizable(0, 0)  # disable resizing
-'''
 
 pytesseract.pytesseract.tesseract_cmd = r'C:\Users\Stephen Wong\AppData\Local\Programs\Tesseract-OCR\tesseract.exe'
-image = cv2.imread("images/addition.png")
+list_of_ascii = [43, 45, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 61, 78]
 
 
+# TODO(optional?): Implement other math operations for more versatility; Refine return statements
 def check_input(input_text):
     text_list = list(input_text)
     for value in text_list:
@@ -23,15 +22,18 @@ def check_input(input_text):
     return "good"
 
 
+# TODO: check ASCII value of characters to determine what math equation to use
 def calculate(input_text):
-    x = text.split("+")
+    if check_input(input_text) == "bad":
+        return "The text contains invalid characters"
+    x = input_text.split("+")
     print(x)
     return sum([int(i) for i in x])
 
 
 def process(input_image, matrix):
     # Grayscale
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    gray = cv2.cvtColor(input_image, cv2.COLOR_BGR2GRAY)
 
     # Dilation + Erosion
     kernel = np.ones(matrix, np.uint8)  # Kernel Matrix
@@ -42,26 +44,26 @@ def process(input_image, matrix):
     thresh = cv2.threshold(dilate_erode, 127, 255, cv2.THRESH_BINARY)[1]
     # invert = cv2.bitwise_not(gray)
 
-    cv2.imshow('gray', gray)
-    cv2.imshow('thresh', thresh)
+    # cv2.imshow('gray', gray)
+    # cv2.imshow('thresh', thresh)
     return thresh
 
 
-process_image = process(image, (2, 3))  # matrix options:(1, 3), (2, 3), (4, 3)
-text = pytesseract.image_to_string(process_image)
+def main_func(image):
+    read_image = cv2.imread(image)
+    process_image = process(read_image, (2, 3))
+    text = pytesseract.image_to_string(process_image, config="--psm 6")
+    if len(text) < 3:
+        process_image = process(read_image, (1, 3))
+    if len(text) < 3:
+        process_image = process(read_image, (4, 3))
+    if len(text) < 3:
+        print("Error processing text")
 
-if len(process_image) < 5:
-    print()
-
-print(text)
-
-# (calculate(text))
+    print(calculate(text))
+    print(text)
 
 
-cv2.waitKey()
-
-
-'''
 def show_image(image):
     win = tk.Toplevel()
     win.image = ImageTk.PhotoImage(image)
@@ -69,16 +71,15 @@ def show_image(image):
     win.grab_set()
     # win.wait_window(win)  # leave window open and wait for window to be destroyed/closed
 
-    image = image.save("images/sample.png")
-    read_image = cv2.imread("images/sample.png")
-    text = pytesseract.image_to_string(read_image, config="--psm 6")
-    print(text)
+    image.save("images/sample.png")
+
+    main_func("images/sample.png")
     os.remove("images/sample.png")
+
     win.destroy()
 
 
 # Record mouse coordinates
-
 def area_sel():
 
     x1 = x2 = y1 = y2 = 0
@@ -134,6 +135,6 @@ def area_sel():
         show_image(roi_image)
 
 
+cv2.waitKey()
 btn = tk.Button(root, text='select area', width=30, command=area_sel).pack()  # select area GUI button
 root.mainloop()
-'''
