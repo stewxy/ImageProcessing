@@ -12,21 +12,21 @@ root.resizable(0, 0)  # disable resizing
 '''
 
 pytesseract.pytesseract.tesseract_cmd = r'C:\Users\Stephen Wong\AppData\Local\Programs\Tesseract-OCR\tesseract.exe'
-
-# # Add Binarization (Thresholding), Noise Removal, Dilation and Erosion, Deskewing from openCV
-# # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-# # text = pytesseract.image_to_string(gray)
-# # print(text)
-#
+image = cv2.imread("images/addition.png")
 
 
-def calculate(text):
+def check_input(input_text):
+    text_list = list(input_text)
+    for value in text_list:
+        if 32 > ord(value) > 57 and ord(value) != 61:
+            return "bad"
+    return "good"
+
+
+def calculate(input_text):
     x = text.split("+")
     print(x)
     return sum([int(i) for i in x])
-
-
-image = cv2.imread("images/addition.png")
 
 
 def process(input_image, matrix):
@@ -49,6 +49,10 @@ def process(input_image, matrix):
 
 process_image = process(image, (2, 3))  # matrix options:(1, 3), (2, 3), (4, 3)
 text = pytesseract.image_to_string(process_image)
+
+if len(process_image) < 5:
+    print()
+
 print(text)
 
 # (calculate(text))
