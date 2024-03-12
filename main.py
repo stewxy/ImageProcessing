@@ -15,25 +15,34 @@ list_of_ascii = [43, 45, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 61, 78]
 
 # TODO(optional?): Implement other math operations for more versatility; Refine return statements
 def check_input(input_text):
+    acceptable_chars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     text_list = list(input_text)
+    print(text_list)
+
     for value in text_list:
         if 32 > ord(value) > 57 and ord(value) != 61:
+            print("ERROR: NOT ALL VALUES IN ASCII RANGE")
             return "bad"
+
+    if all([c in acceptable_chars for c in text_list[:-1]]):
+        print("ERROR: ALL VALUES ARE NUMBERS")
+        return "bad"
+
     return "good"
 
 
 # TODO: check ASCII value of characters to determine what math equation to use
 def calculate(input_text):
-    if check_input(input_text) == "bad":
-        return "The text contains invalid characters"
     x = input_text.split("+")
-    print(x)
     return sum([int(i) for i in x])
 
 
 def process(input_image, matrix):
+    resized_image = cv2.resize(input_image, (300, 300))
+    # , interpolation=cv2.INTER_AREA
+
     # Grayscale
-    gray = cv2.cvtColor(input_image, cv2.COLOR_BGR2GRAY)
+    gray = cv2.cvtColor(resized_image, cv2.COLOR_BGR2GRAY)
 
     # Dilation + Erosion
     kernel = np.ones(matrix, np.uint8)  # Kernel Matrix
@@ -44,23 +53,31 @@ def process(input_image, matrix):
     thresh = cv2.threshold(dilate_erode, 127, 255, cv2.THRESH_BINARY)[1]
     # invert = cv2.bitwise_not(gray)
 
-    # cv2.imshow('gray', gray)
-    # cv2.imshow('thresh', thresh)
+    cv2.imshow('gray', gray)
+    cv2.imshow('dilate', dilate)
+    cv2.imshow('dilate_erode', dilate_erode)
+    cv2.imshow('thresh', thresh)
+    cv2.imshow('resized_image', resized_image)
     return thresh
 
 
 def main_func(image):
     read_image = cv2.imread(image)
-    process_image = process(read_image, (2, 3))
-    text = pytesseract.image_to_string(process_image, config="--psm 6")
+    process_image = process(read_image, (4, 3))
+    text = pytesseract.image_to_string(process_image, config="--psm 7")
     if len(text) < 3:
+        print("Try 2")
         process_image = process(read_image, (1, 3))
     if len(text) < 3:
+        print("Try 3")
         process_image = process(read_image, (4, 3))
     if len(text) < 3:
         print("Error processing text")
 
-    print(calculate(text))
+    if check_input(text) == "bad":
+        return "The text contains invalid characters"
+    else:
+        print(calculate(text))
     print(text)
 
 
