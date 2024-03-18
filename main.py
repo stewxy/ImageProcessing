@@ -11,6 +11,8 @@ root.resizable(0, 0)  # disable resizing
 
 pytesseract.pytesseract.tesseract_cmd = r'C:\Users\Stephen Wong\AppData\Local\Programs\Tesseract-OCR\tesseract.exe'
 list_of_ascii = [43, 45, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 61, 78]
+image_width = 0
+image_height = 0
 
 
 # TODO(optional?): Implement other math operations for more versatility; Refine return statements
@@ -37,8 +39,9 @@ def calculate(input_text):
     return sum([int(i) for i in x])
 
 
+# TODO: vary scale size depending on size of snipped image
 def process(input_image, matrix):
-    resized_image = cv2.resize(input_image, (300, 300))
+    resized_image = cv2.resize(input_image, (image_width*2, image_height*2))
     # , interpolation=cv2.INTER_AREA
 
     # Grayscale
@@ -87,7 +90,7 @@ def show_image(image):
     tk.Label(win, image=win.image).pack()
     win.grab_set()
     # win.wait_window(win)  # leave window open and wait for window to be destroyed/closed
-
+    print(image_width, image_height)
     image.save("images/sample.png")
 
     main_func("images/sample.png")
@@ -119,9 +122,12 @@ def area_sel():
         canvas.lift('roi')  # places select rectangle on top of overlay image
 
     def on_mouse_release(event):
-            x2, y2 = event.x, event.y
-            print('{}, {}'.format(x2, y2))
-            win.destroy()
+        global image_width, image_height
+        x2, y2 = event.x, event.y
+        print('{}, {}'.format(x2, y2))
+        image_width = x2-x1
+        image_height = y2-y1
+        win.destroy()
 
     root.withdraw()  # hide GUI
     image = ImageGrab.grab()  # grab current screen
