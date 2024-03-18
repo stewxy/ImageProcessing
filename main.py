@@ -53,17 +53,17 @@ def process(input_image, matrix):
     thresh = cv2.threshold(dilate_erode, 127, 255, cv2.THRESH_BINARY)[1]
     # invert = cv2.bitwise_not(gray)
 
-    cv2.imshow('gray', gray)
-    cv2.imshow('dilate', dilate)
-    cv2.imshow('dilate_erode', dilate_erode)
-    cv2.imshow('thresh', thresh)
+    join = np.concatenate((gray, dilate, dilate_erode, thresh), axis=1)
+    cv2.imshow('gray - dilate - dilate+erode - thresh', join)
+
     cv2.imshow('resized_image', resized_image)
+
     return thresh
 
 
 def main_func(image):
     read_image = cv2.imread(image)
-    process_image = process(read_image, (4, 3))
+    process_image = process(read_image, (2, 3))
     text = pytesseract.image_to_string(process_image, config="--psm 7")
     if len(text) < 3:
         print("Try 2")
