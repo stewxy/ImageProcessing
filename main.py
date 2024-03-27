@@ -19,7 +19,6 @@ image_height = 0
 def check_input(input_text):
     acceptable_chars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     text_list = list(input_text)
-    print(text_list)
 
     for value in text_list:
         if 32 > ord(value) > 57 and ord(value) != 61:
@@ -35,13 +34,23 @@ def check_input(input_text):
 
 # TODO: check ASCII value of characters to determine what math equation to use
 def calculate(input_text):
-    x = input_text.split("+")
-    return sum([int(i) for i in x])
+    input_list = list(input_text)
+    result = 0
+    for i in range(len(input_list)):
+        if ord(input_list[i]) == 43:
+            result += (int(input_list[i-1]) + int(input_list[i+1]))
+        if ord(input_list[i]) == 45:
+            result += (int(input_list[i-1]) - int(input_list[i + 1]))
+        if ord(input_list[i]) == 78 or ord(input_list[i]) == 42:
+            result += (int(input_list[i-1]) * int(input_list[i + 1]))
+        if ord(input_list[i]) == 47:
+            result += (int(input_list[i-1]) / int(input_list[i + 1]))
+    return result
 
 
 # TODO: vary scale size depending on size of snipped image
 def process(input_image, matrix):
-    resized_image = cv2.resize(input_image, (image_width*2, image_height*2))
+    resized_image = cv2.resize(input_image, (image_width * 2, image_height * 2))
     # , interpolation=cv2.INTER_AREA
 
     # Grayscale
@@ -80,8 +89,8 @@ def main_func(image):
     if check_input(text) == "bad":
         return "The text contains invalid characters"
     else:
-        print(calculate(text))
-    print(text)
+        print("ANSWER: ", calculate(text))
+    print("READ TEXT: ", list(text))
 
 
 def show_image(image):
@@ -101,7 +110,6 @@ def show_image(image):
 
 # Record mouse coordinates
 def area_sel():
-
     x1 = x2 = y1 = y2 = 0
     roi_image = None
 
@@ -125,8 +133,8 @@ def area_sel():
         global image_width, image_height
         x2, y2 = event.x, event.y
         print('{}, {}'.format(x2, y2))
-        image_width = x2-x1
-        image_height = y2-y1
+        image_width = x2 - x1
+        image_height = y2 - y1
         win.destroy()
 
     root.withdraw()  # hide GUI
