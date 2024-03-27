@@ -32,7 +32,6 @@ def check_input(input_text):
     return "good"
 
 
-# TODO: check ASCII value of characters to determine what math equation to use
 def calculate(input_text):
     input_list = list(input_text)
     result = 0
@@ -48,9 +47,13 @@ def calculate(input_text):
     return result
 
 
-# TODO: vary scale size depending on size of snipped image
 def process(input_image, matrix):
-    resized_image = cv2.resize(input_image, (image_width * 2, image_height * 2))
+    multiplier = 2
+    if image_width + image_height < 300:
+        multiplier = 3
+    elif image_width + image_height > 900:
+        multiplier = 1
+    resized_image = cv2.resize(input_image, (image_width * multiplier, image_height * multiplier))
     # , interpolation=cv2.INTER_AREA
 
     # Grayscale
