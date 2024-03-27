@@ -34,16 +34,28 @@ def check_input(input_text):
 
 def calculate(input_text):
     input_list = list(input_text)
-    result = 0
+    result = None
     for i in range(len(input_list)):
         if ord(input_list[i]) == 43:
-            result += (int(input_list[i-1]) + int(input_list[i+1]))
+            if result is None:
+                result = (int(input_list[i-1]) + int(input_list[i+1]))
+            else:
+                result += int(input_list[i+1])
         if ord(input_list[i]) == 45:
-            result += (int(input_list[i-1]) - int(input_list[i + 1]))
+            if result is None:
+                result = (int(input_list[i-1]) - int(input_list[i + 1]))
+            else:
+                result -= int(input_list[i + 1])
         if ord(input_list[i]) == 78 or ord(input_list[i]) == 42:
-            result += (int(input_list[i-1]) * int(input_list[i + 1]))
+            if result is None:
+                result += (int(input_list[i-1]) * int(input_list[i + 1]))
+            else:
+                result *= int(input_list[i + 1])
         if ord(input_list[i]) == 47:
-            result += (int(input_list[i-1]) / int(input_list[i + 1]))
+            if result is None:
+                result += (int(input_list[i-1]) / int(input_list[i + 1]))
+            else:
+                result /= int(input_list[i + 1])
     return result
 
 
