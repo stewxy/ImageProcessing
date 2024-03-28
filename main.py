@@ -4,6 +4,7 @@ import pytesseract
 from PIL import Image, ImageGrab, ImageTk, ImageEnhance
 import numpy as np
 import tkinter as tk
+import re
 
 root = tk.Tk()  # initialize tkinter framework
 root.title("GUI")
@@ -15,7 +16,6 @@ image_width = 0
 image_height = 0
 
 
-# TODO(optional?): Implement other math operations for more versatility; Refine return statements
 def check_input(input_text):
     acceptable_chars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     text_list = list(input_text)
@@ -33,9 +33,16 @@ def check_input(input_text):
 
 
 def calculate(input_text):
-    input_list = list(input_text)
+    print(str(input_text))
+    input_list = list(filter(None, re.split(r'(\d[0-9])', input_text)))
+    if len(input_list) == 1:
+        input_list = list(filter(None, re.split(r'(\d)', input_text)))
+
+    # input_list = [input_text.strip()]
+    print(input_list)
     result = None
     for i in range(len(input_list)):
+        print(ord(input_list[i]))
         if ord(input_list[i]) == 43:
             if result is None:
                 result = (int(input_list[i-1]) + int(input_list[i+1]))
@@ -48,12 +55,12 @@ def calculate(input_text):
                 result -= int(input_list[i + 1])
         if ord(input_list[i]) == 78 or ord(input_list[i]) == 42:
             if result is None:
-                result += (int(input_list[i-1]) * int(input_list[i + 1]))
+                result = (int(input_list[i-1]) * int(input_list[i + 1]))
             else:
                 result *= int(input_list[i + 1])
         if ord(input_list[i]) == 47:
             if result is None:
-                result += (int(input_list[i-1]) / int(input_list[i + 1]))
+                result = (int(input_list[i-1]) / int(input_list[i + 1]))
             else:
                 result /= int(input_list[i + 1])
     return result
@@ -76,14 +83,16 @@ def process(input_image, matrix):
     dilate = cv2.dilate(gray, kernel, iterations=1)
     dilate_erode = cv2.erode(dilate, kernel, iterations=2)
 
+    # blur = cv2.GaussianBlur(dilate_erode, (21, 21), 0)
+
     # Threshold
-    thresh = cv2.threshold(dilate_erode, 127, 255, cv2.THRESH_BINARY)[1]
+    thresh = cv2.threshold(dilate_erode, 127, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
+
     # invert = cv2.bitwise_not(gray)
 
-    join = np.concatenate((gray, dilate, dilate_erode, thresh), axis=1)
-    cv2.imshow('gray - dilate - dilate+erode - thresh', join)
-
-    cv2.imshow('resized_image', resized_image)
+    # join = np.concatenate((gray, dilate, dilate_erode, thresh), axis=1)
+    # cv2.imshow('gray - dilate - dilate+erode - thresh', join)
+    cv2.imshow('thresh', thresh)
 
     return thresh
 
@@ -92,6 +101,7 @@ def main_func(image):
     read_image = cv2.imread(image)
     process_image = process(read_image, (2, 3))
     text = pytesseract.image_to_string(process_image, config="--psm 7")
+    print("READ TEXT: ", text)
     if len(text) < 3:
         print("Try 2")
         process_image = process(read_image, (1, 3))
@@ -105,7 +115,7 @@ def main_func(image):
         return "The text contains invalid characters"
     else:
         print("ANSWER: ", calculate(text))
-    print("READ TEXT: ", list(text))
+
 
 
 def show_image(image):
