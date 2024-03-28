@@ -38,31 +38,31 @@ def calculate(input_text):
     if len(input_list) == 1:
         input_list = list(filter(None, re.split(r'(\d)', input_text)))
 
-    # input_list = [input_text.strip()]
     print(input_list)
     result = None
+
     for i in range(len(input_list)):
-        print(ord(input_list[i]))
-        if ord(input_list[i]) == 43:
-            if result is None:
-                result = (int(input_list[i-1]) + int(input_list[i+1]))
-            else:
-                result += int(input_list[i+1])
-        if ord(input_list[i]) == 45:
-            if result is None:
-                result = (int(input_list[i-1]) - int(input_list[i + 1]))
-            else:
-                result -= int(input_list[i + 1])
-        if ord(input_list[i]) == 78 or ord(input_list[i]) == 42:
-            if result is None:
-                result = (int(input_list[i-1]) * int(input_list[i + 1]))
-            else:
-                result *= int(input_list[i + 1])
-        if ord(input_list[i]) == 47:
-            if result is None:
-                result = (int(input_list[i-1]) / int(input_list[i + 1]))
-            else:
-                result /= int(input_list[i + 1])
+        if not input_list[i].isdigit():
+            if ord(input_list[i]) == 43:
+                if result is None:
+                    result = (int(input_list[i-1]) + int(input_list[i+1]))
+                else:
+                    result += int(input_list[i+1])
+            if ord(input_list[i]) == 45:
+                if result is None:
+                    result = (int(input_list[i-1]) - int(input_list[i + 1]))
+                else:
+                    result -= int(input_list[i + 1])
+            if ord(input_list[i]) == 78 or ord(input_list[i]) == 42:
+                if result is None:
+                    result = (int(input_list[i-1]) * int(input_list[i + 1]))
+                else:
+                    result *= int(input_list[i + 1])
+            if ord(input_list[i]) == 47:
+                if result is None:
+                    result = (int(input_list[i-1]) / int(input_list[i + 1]))
+                else:
+                    result /= int(input_list[i + 1])
     return result
 
 
